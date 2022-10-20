@@ -1,13 +1,15 @@
 openapi: 3.0.3
 info:
   title: CryptoBot - Accounts
-  description: microservicio encargado del manejo de las cuentas de clientes y administradores
+  description: >-
+    microservicio encargado del manejo de las cuentas de clientes y
+    administradores
   version: 0.1.0
 paths:
   /accounts/create:
     post:
       tags:
-        - client
+        - account
       summary: creates client user
       description: create the user saves it on the database
       requestBody:
@@ -21,15 +23,15 @@ paths:
         '200':
           description: account created
         '208':
-          description: account already exists  
+          description: account already exists
         '500':
           description: Internal error creating account
-  /accounts/login(example):
+  /accounts/login(to_do):
     post:
       tags:
-        - admin
-      summary: log in admin user on web platform
-      description: the admin manually enters the web platform
+        - account
+      summary: log in user on web platform
+      description: the  manually enters the web platform
       requestBody:
         description: log in account
         content:
@@ -41,13 +43,13 @@ paths:
         '200':
           description: account logged
         '208':
-          description: account already on session
+          description: account already on session(to_do)
         '500':
           description: Internal error log in account
   /accounts/edit:
     post:
       tags:
-        - client
+        - account
       summary: edits client user properties using the telegram_id
       description: updates the user account in the database
       requestBody:
@@ -65,7 +67,7 @@ paths:
   /accounts/change-password:
     post:
       tags:
-        - admin
+        - account
       summary: change password using account email
       description: updates the user account in the database
       requestBody:
@@ -80,104 +82,70 @@ paths:
           description: password changed
         '500':
           description: Internal error editing account
-  /accounts/delete:
-    post:
+  /accounts/delete/:telegram_id:
+    delete:
       tags:
-        - client
+        - account
       summary: deletes client user properties using the telegram_id
       description: deletes the user account in the database with the telegram_id
-      requestBody:
-        description: delete user account
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/delete'
-        required: true
       responses:
         '200':
           description: account deleted
-        '208':
-          description: account not found
         '500':
-          description: Internal error editing account        
-
+          description: Internal error editing account
 components:
   schemas:
     edit:
       type: object
       properties:
-          telegram_id:
-            type: integer
-            example: "123"
-          first_name:
-            type: string
-            example: "juan"
-          last_name:
-            type: string
-            example: "cardenas"
-          email:
-            type: string
-            example: "juan@example.com"
-          username:
-            type: string
-            example: "sagarus"
-          password:
-            type: string
-            example: "cerradura"
-          rol:
-            type: string
-            example: "cliente"
+        telegram_id:
+          type: integer
+          example: '123'
+        first_name:
+          type: string
+          example: juan
+        last_name:
+          type: string
+          example: cardenas
+        email:
+          type: string
+          example: juan@example.com
+        username:
+          type: string
+          example: sagarus
     create:
       type: object
       properties:
-          telegram_id:
-            type: integer
-            example: "123"
-          first_name:
-            type: string
-            example: "juan"
-          last_name:
-            type: string
-            example: "cardenas"
-          email:
-            type: string
-            example: "juan@example.com"
-          username:
-            type: string
-            example: "sagarus"
-          password:
-            type: string
-            example: "cerradura"
-          rol:
-            type: string
-            example: "cliente"
-    delete:
-      type: object
-      properties:
-          telegram_id:
-            type: integer
-            example: "123"
+        telegram_id:
+          type: integer
+          example: '123'
+        first_name:
+          type: string
+          example: juan
+        last_name:
+          type: string
+          example: cardenas
+        username:
+          type: string
+          example: sagarus
+        rol:
+          type: string
+          example: cliente
     password:
       type: object
       properties:
-          email:
-            type: string
-            example: "juan@example.com"
-          password:
-            type: string
-            example: "cerradura"
+        telegram_id:
+          type: integer
+          example: '123'
+        password:
+          type: string
+          example: cerradura
     log_in:
       type: object
       properties:
-          username:
-            type: string
-            example: "sagarus"
-          password:
-            type: string
-            example: "cerradura"
-          
-         
-          
-        
-  
-          
+        username:
+          type: string
+          example: sagarus
+        password:
+          type: string
+          example: cerradura
