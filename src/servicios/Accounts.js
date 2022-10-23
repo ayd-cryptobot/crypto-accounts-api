@@ -53,7 +53,7 @@ endpoints.post('/accounts/create',async(req,res)=> {
       if (err) throw err;
       console.log("Connected!");
 
-      var sql = "INSERT INTO accounts (telegram_id,first_name, last_name,  username,  rol) VALUES ('"+telegram_id+"','"+first_name+"','"+ last_name+"','"+ username+"','"+ rol+"');";
+      var sql = "INSERT INTO user (telegram_id,first_name, last_name,  username,  rol) VALUES ('"+telegram_id+"','"+first_name+"','"+ last_name+"','"+ username+"','"+ rol+"');";
       con.query(sql, function (err, result) {
         if (err) throw err;
         console.log("1 record inserted");
@@ -95,7 +95,7 @@ const id=buff;
     if (err) throw err;
     console.log("Connected!");
 
-    var sql = "SELECT password FROM  accounts WHERE(username='"+username+"')" ;
+    var sql = "SELECT password FROM  user WHERE(username='"+username+"')" ;
     con.query(sql, function (err, result) {
       if (err) throw err;
       if(result==password){
@@ -147,7 +147,7 @@ const id=buff;
     if (err) throw err;
    
 
-    var sql = "UPDATE accounts SET first_name='"+ first_name+"', last_name='"+ last_name+"', email='"+ email+"', username='"+ username+"' WHERE(telegram_id='"+telegram_id+"');";
+    var sql = "UPDATE user SET first_name='"+ first_name+"', last_name='"+ last_name+"', email='"+ email+"', username='"+ username+"' WHERE(telegram_id='"+telegram_id+"');";
     console.log(sql);
     con.query(sql, function (err, result) {
       if (err) throw err;
@@ -189,7 +189,7 @@ const id=buff;
     if (err) throw err;
    
 
-    var sql = "UPDATE accounts SET  password='"+password+"' WHERE(telegram_id='"+telegram_id+"');";
+    var sql = "UPDATE user SET  password='"+password+"' WHERE(telegram_id='"+telegram_id+"');";
     console.log(sql);
     con.query(sql, function (err, result) {
       if (err) throw err;
@@ -218,7 +218,7 @@ endpoints.post('/accounts/delete/:telegram_id',async(req,res)=> {
     if (err) throw err;
    
 
-    var sql = "DELETE from accounts  WHERE(telegram_id='"+telegram_id+"');";
+    var sql = "DELETE from user  WHERE(telegram_id='"+telegram_id+"');";
     console.log(sql);
     con.query(sql, function (err, result) {
       if (err) throw err;
