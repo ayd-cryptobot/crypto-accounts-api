@@ -36,7 +36,7 @@ var rol;
 endpoints.post('/accounts/create', async (req, res) => {
   console.log(req.body, "este es el body")
  
-
+  try {
     //const buff = Buffer.from(req.body.message.data, 'base64');
     //const buff = Buffer.from(req.body.message.data, 'base64');
     const buff = req.body;
@@ -58,7 +58,7 @@ endpoints.post('/accounts/create', async (req, res) => {
 
 
     var con = await PromiseConnection();
-    try {
+ 
      // con.connect(async function (err) {
         //if(err)catchDuplicateFunction(res, err)
         console.log("Connected!");
