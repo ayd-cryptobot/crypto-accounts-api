@@ -10,8 +10,19 @@ var con =  mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: "sys"
+  database: "accounts"
 });
+
+async function PromiseConnection(){
+  var con = await mysqlpro.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "root",
+    database: "accounts"
+  });
+  return con;
+}
+
 
 //account variables
 var first_name;
@@ -46,19 +57,14 @@ endpoints.post('/accounts/create', async (req, res) => {
     rol = "cliente";
 
 
-    var con = await mysqlpro.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "root",
-      database: "sys"
-    });
+    var con = await PromiseConnection();
     try {
      // con.connect(async function (err) {
         //if(err)catchDuplicateFunction(res, err)
         console.log("Connected!");
 
         var sql = "INSERT INTO user (telegram_id,first_name, last_name,  username,  rol) VALUES ('" + telegram_id + "','" + first_name + "','" + last_name + "','" + username + "','" + rol + "');";
-        const result =await con.query(sql) 
+        const result =await con.query(sql);
          //if(err)catchDuplicateFunction(res, err)
         console.log("1 record inserted");
           res.json({ "message": "1 record inserted" });
@@ -83,8 +89,7 @@ endpoints.post('/accounts/create', async (req, res) => {
 
 endpoints.post('/accounts/login', async (req, res) => {
   console.log(req.body, "este es el body")
-
-
+try{
   //const buff = Buffer.from(req.body.message.data, 'base64');
   //const buff = Buffer.from(req.body.message.data, 'base64');
   const buff = req.body;
@@ -98,44 +103,50 @@ endpoints.post('/accounts/login', async (req, res) => {
   //  telegram_id=JSON.parse(id).chat_id;
   //  password=JSON.parse(id).password;
   //  rol=JSON.parse(id).rol;
-
-
-  username = id.username;
-  password = id.password;
-
-
-
-
-
-  con.connect(function (err) {
-    if (err) throw err;
+  var username = id.username;
+ var  password = id.password;
+  var con = await PromiseConnection();
     console.log("Connected!");
 
-    var sql = "SELECT password FROM  user WHERE(username='" + username + "')";
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      if (result == password) {
+    var sql = "SELECT password FROM  user WHERE(username='"+username+"')";
+    console.log(sql);
+    const result =await con.query(sql);
+    const rtaPassword=result[0][0].password
+    console.log(rtaPassword);
+
+if(rtaPassword){
+      if (rtaPassword == password) {
         res.json({
           "message": "log-in"
         })
-        filter = JSON.stringify(true);
-        publishMessage(true);
+        res.end;
       }
       else {
-        res.json({ "mensaje": "contraseña o usuario incorrecto" })
-        filter = JSON.stringify(false);
-        publishMessage(false);
+        res.json({
+          "message": "invalid password"
+        })
+        res.end;
       }
-      console.log("1 record inserted");
-    });
-  });
+}
+else{
+  res.json({
+    "message": "account doesnt exist"
+  })
   res.end;
+}
 
+    }
+    catch(err){
+console.log(err)
+res.json("invalid account");
+res.end;
+    }
 })
+
 endpoints.post('/accounts/edit', async (req, res) => {
   console.log(req.body, "este es el body")
 
-
+try{
   //const buff = Buffer.from(req.body.message.data, 'base64');
   //const buff = Buffer.from(req.body.message.data, 'base64');
   const buff = req.body;
@@ -149,78 +160,31 @@ endpoints.post('/accounts/edit', async (req, res) => {
   //  telegram_id=JSON.parse(id).chat_id;
   //  password=JSON.parse(id).password;
   //  rol=JSON.parse(id).rol;
-  first_name = id.first_name;
-  last_name = id.last_name;
+  first_name = id.firstname;
+  last_name = id.lastname;
   email = id.email;
   username = id.username;
-  telegram_id = id.telegram_id;
+  telegram_id = id.telegramID;
+  password=id.password;
+  var con = await PromiseConnection();
 
 
-
-
-
-  con.connect(function (err) {
-    if (err) throw err;
-
-
-    var sql = "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email + "', username='" + username + "' WHERE(telegram_id='" + telegram_id + "');";
+    var sql = "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email + "', username='" + username + "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
-    con.query(sql, function (err, result) {
-      if (err) throw err;
+    const result =await con.query(sql);
       console.log("1 record edited");
       res.json({ "message": "1 record edited" });
-    });
-  });
   res.end;
-
-
-})
-
-endpoints.post('/accounts/change-password', async (req, res) => {
-  console.log(req.body, "este es el body")
-
-
-  //const buff = Buffer.from(req.body.message.data, 'base64');
-  //const buff = Buffer.from(req.body.message.data, 'base64');
-  const buff = req.body;
-  //const id=buff.toString('utf-8')
-  const id = buff;
-  //console.log(JSON.parse(id));
-  //  first_name=JSON.parse(id).first_name;
-  //  last_name=JSON.parse(id).last_name;
-  //  email=JSON.parse(id).email;
-  //  username=JSON.parse(id).username;
-  //  telegram_id=JSON.parse(id).chat_id;
-  //  password=JSON.parse(id).password;
-  //  rol=JSON.parse(id).rol;
-
-  telegram_id = id.telegram_id;
-
-  password = id.password;
-
-
-
-
-  con.connect(function (err) {
-    if (err) throw err;
-
-
-    var sql = "UPDATE user SET  password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
-    console.log(sql);
-    con.query(sql, function (err, result) {
-      if (err) throw err;
-      console.log("1 record inserted");
-      res.json({ "message": "1 record edited" });
-    });
-  });
-  res.end;
-
-
+}
+catch(err){
+console.log(err)
+res.end
+}
 })
 
 endpoints.post('/accounts/delete/:telegram_id', async (req, res) => {
   console.log(req.body, "este es el body")
-
+try{
   let telegram_id = req.params.telegram_id
 
   //const buff = Buffer.from(req.body.message.data, 'base64');
@@ -229,21 +193,21 @@ endpoints.post('/accounts/delete/:telegram_id', async (req, res) => {
   //const id=buff.toString('utf-8')
 
 
-
-  con.connect(function (err) {
-    if (err) throw err;
+  var con = await PromiseConnection();
 
 
     var sql = "DELETE from user  WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
-    con.query(sql, function (err, result) {
-      if (err) throw err;
+    const result =await con.query(sql);
       console.log("1 record inserted");
       res.json({ "message": "1 record deleted" });
-    });
-  });
   res.end;
-
+}
+catch(err){
+  console.log(err)
+  res.json({ "message": "wrong direction" });
+  res.end
+}
 
 })
 
