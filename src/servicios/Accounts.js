@@ -6,12 +6,6 @@ const axios = require('axios')
 var mysql = require('mysql2');
 var mysqlpro = require('mysql2/promise');
 
-var con =  mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "accounts"
-});
 
 async function PromiseConnection(){
   var con = await mysqlpro.createConnection({
@@ -67,6 +61,16 @@ endpoints.post('/accounts/create', async (req, res) => {
         const result =await con.query(sql);
          //if(err)catchDuplicateFunction(res, err)
         console.log("1 record inserted");
+        const pubSubMessage={
+          "telegram_user_id":telegram_id,
+          "operation_type":"create",
+          "first_name":first_name,
+          "last_name":last_name,
+          "username":username,
+          "email":""
+          }
+                    
+       await  publishMessage(JSON.stringify(pubSubMessage))
           res.json({ "message": "1 record inserted" });
           res.end
         
@@ -169,11 +173,22 @@ try{
   var con = await PromiseConnection();
 
 
-    var sql = "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email + "', username='" + username + "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
+    var sql = "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email +  "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
     const result =await con.query(sql);
-      console.log("1 record edited");
+      console.log("1 record updated");
+      const pubSubMessage={
+        "telegram_user_id":telegram_id,
+        "operation_type":"update",
+        "first_name":first_name,
+        "last_name":last_name,
+        "username":username,
+        "email":email
+        }
+                  
+     await  publishMessage(JSON.stringify(pubSubMessage))
       res.json({ "message": "1 record edited" });
+
   res.end;
 }
 catch(err){
@@ -181,11 +196,48 @@ console.log(err)
 res.end
 }
 })
+endpoints.get('/accounts/consult/:telegramID', async (req, res) => {
+  
 
-endpoints.post('/accounts/delete/:telegram_id', async (req, res) => {
+try{
+  let telegram_id = req.params.telegramID
+  console.log(telegram_id, "este es el body")
+
+
+  var con = await PromiseConnection();
+
+
+    var sql = "SELECT telegram_id, first_name,last_name, email, username, password FROM user   WHERE(telegram_id='" + telegram_id + "');";
+    console.log(sql);
+    var result =await con.query(sql);
+    result=result[0][0]
+      console.log("record sended");
+
+     const Message= await
+     {
+      "telegramID":result.telegram_id,
+      "firstname":result.first_name,
+      "lastname":result.last_name,
+      "username":result.username,
+      "email":result.email,
+      "password":result.password
+      }
+      console.log(Message);
+      res.json(Message);
+
+  res.end;
+}
+catch(err){
+console.log(err)
+res.json("error on data");
+res.end
+}
+})
+
+endpoints.delete('/accounts/delete/:telegramID', async (req, res) => {
   console.log(req.body, "este es el body")
 try{
-  let telegram_id = req.params.telegram_id
+  let telegram_id = req.params.telegramID
 
   //const buff = Buffer.from(req.body.message.data, 'base64');
   //const buff = Buffer.from(req.body.message.data, 'base64');
@@ -200,6 +252,12 @@ try{
     console.log(sql);
     const result =await con.query(sql);
       console.log("1 record inserted");
+      const pubSubMessage={
+        "telegram_user_id":telegram_id,
+        "operation_type":"delete"
+        }
+                  
+     await  publishMessage(JSON.stringify(pubSubMessage))
       res.json({ "message": "1 record deleted" });
   res.end;
 }
@@ -210,6 +268,32 @@ catch(err){
 }
 
 })
+ //gcloud auth application-default login   
+/**
+ * TODO(developer): Uncomment these variables before running the sample.
+ */
+// const topicNameOrId = 'YOUR_TOPIC_NAME_OR_ID';
+// const data = JSON.stringify({foo: 'bar'});
 
+// Imports the Google Cloud client library
+const {PubSub} = require('@google-cloud/pubsub');
+
+// Creates a client; cache this for further use
+const pubSubClient = new PubSub();
+GOOGLE_APPLICATION_CREDENTIALS = '.\cryptobot-369523'
+async function publishMessage(messaging) {
+  // Publishes the message as a string, e.g. "Hello, world!" or JSON.stringify(someObject)
+  const dataBuffer = Buffer.from(messaging);
+
+  try {
+    const messageId = await pubSubClient
+      .topic("projects/cryptobot-369523/topics/accounts-events-topic")
+      .publishMessage({data:dataBuffer});
+    console.log(`Message ${messageId} published.`);
+  } catch (error) {
+    console.error(`Received error while publishing: ${error.message}`);
+    process.exitCode = 1;
+  }
+}
 
 module.exports = endpoints
