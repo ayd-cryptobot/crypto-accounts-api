@@ -5,7 +5,8 @@ const axios = require('axios')
 //database    
 var mysql = require('mysql2');
 var mysqlpro = require('mysql2/promise');
-
+const dotenv = require('dotenv')
+dotenv.config({path: '.env'})
 
 async function PromiseConnection() {
   con = await mysqlpro.createConnection({
