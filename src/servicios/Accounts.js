@@ -7,14 +7,14 @@ var mysql = require('mysql2');
 var mysqlpro = require('mysql2/promise');
 
 
-async function PromiseConnection(){
-  var con = await mysqlpro.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "root",
-    database: "accounts"
+async function PromiseConnection() {
+  con = await mysqlpro.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_DATABASE
   });
-  return con;
+
 }
 
 
@@ -78,7 +78,9 @@ endpoints.post('/accounts/create', async (req, res) => {
 
     
   } catch (err) {
+
     console.log(err)
+   
   res.status(208).json({
     message: "invalid account ",
     status: 208
