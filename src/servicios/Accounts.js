@@ -1,13 +1,12 @@
 const express = require('express')
-const endpoints = express.Router()
+const endpoints = express()
 
 const axios = require('axios')
 //database    
-var mysql = require('mysql2');
 var mysqlpro = require('mysql2/promise');
 const dotenv = require('dotenv')
 dotenv.config({path: '.env'})
-
+var con
 async function PromiseConnection() {
   con = await mysqlpro.createConnection({
     host: process.env.DB_HOST,
@@ -32,19 +31,11 @@ endpoints.post('/accounts/create', async (req, res) => {
   console.log(req.body, "este es el body")
  
   try {
-    //const buff = Buffer.from(req.body.message.data, 'base64');
-    //const buff = Buffer.from(req.body.message.data, 'base64');
+
     const buff = req.body;
-    //const id=buff.toString('utf-8')
+
     const id = buff;
-    //console.log(JSON.parse(id));
-    //  first_name=JSON.parse(id).first_name;
-    //  last_name=JSON.parse(id).last_name;
-    //  email=JSON.parse(id).email;
-    //  username=JSON.parse(id).username;
-    //  telegram_id=JSON.parse(id).chat_id;
-    //  password=JSON.parse(id).password;
-    //  rol=JSON.parse(id).rol;
+
     first_name = id.firstName;
     last_name = id.lastName;
     username = id.username;
@@ -52,16 +43,16 @@ endpoints.post('/accounts/create', async (req, res) => {
     rol = "cliente";
 
 
-    var con = await PromiseConnection();
+     await PromiseConnection();
  
      // con.connect(async function (err) {
         //if(err)catchDuplicateFunction(res, err)
         console.log("Connected!");
 
-        var sql = "INSERT INTO user (telegram_id,first_name, last_name,  username,  rol) VALUES ('" + telegram_id + "','" + first_name + "','" + last_name + "','" + username + "','" + rol + "');";
-        const result =await con.query(sql);
-         //if(err)catchDuplicateFunction(res, err)
-        console.log("1 record inserted");
+        var sql =  "INSERT INTO user (telegram_id,first_name, last_name,  username,  rol) VALUES ('" + telegram_id + "','" + first_name + "','" + last_name + "','" + username + "','" + rol + "');";
+        console.log(sql);
+        await con.query(sql);
+        console.log(sql);
         const pubSubMessage={
           "telegram_user_id":telegram_id,
           "operation_type":"create",
@@ -112,7 +103,7 @@ try{
   //  rol=JSON.parse(id).rol;
   var username = id.username;
  var  password = id.password;
-  var con = await PromiseConnection();
+   await PromiseConnection();
     console.log("Connected!");
 
     var sql = "SELECT password FROM  user WHERE(username='"+username+"')";
@@ -207,7 +198,7 @@ try{
   console.log(telegram_id, "este es el body")
 
 
-  var con = await PromiseConnection();
+  await PromiseConnection();
 
 
     var sql = "SELECT telegram_id, first_name,last_name, email, username, password FROM user   WHERE(telegram_id='" + telegram_id + "');";
@@ -248,7 +239,7 @@ try{
   //const id=buff.toString('utf-8')
 
 
-  var con = await PromiseConnection();
+   await PromiseConnection();
 
 
     var sql = "DELETE from user  WHERE(telegram_id='" + telegram_id + "');";
