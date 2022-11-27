@@ -164,7 +164,7 @@ try{
   username = id.username;
   telegram_id = id.telegramID;
   password=id.password;
-  var con = await PromiseConnection();
+  con = await PromiseConnection();
 
 
     var sql = "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email +  "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
