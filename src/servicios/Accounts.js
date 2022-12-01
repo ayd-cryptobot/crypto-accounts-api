@@ -19,13 +19,13 @@ async function PromiseConnection() {
 
 
 //account variables
-var first_name;
-var last_name;
-var email;
-var username;
-var telegram_id;
-var password;
-var rol;
+var first_name="";
+var last_name="";
+var email="";
+var username="";
+var telegram_id="";
+var password="";
+var rol="";
 
 endpoints.post('/accounts/create', async (req, res) => {
   console.log(req.body, "este es el body")
@@ -145,29 +145,24 @@ endpoints.post('/accounts/edit', async (req, res) => {
   console.log(req.body, "este es el body")
 
 try{
+  con = await PromiseConnection();
   //const buff = Buffer.from(req.body.message.data, 'base64');
   //const buff = Buffer.from(req.body.message.data, 'base64');
-  const buff = req.body;
+  const buff = await req.body;
   //const id=buff.toString('utf-8')
   const id = buff;
-  //console.log(JSON.parse(id));
-  //  first_name=JSON.parse(id).first_name;
-  //  last_name=JSON.parse(id).last_name;
-  //  email=JSON.parse(id).email;
-  //  username=JSON.parse(id).username;
-  //  telegram_id=JSON.parse(id).chat_id;
-  //  password=JSON.parse(id).password;
-  //  rol=JSON.parse(id).rol;
-  first_name = id.firstname;
-  last_name = id.lastname;
-  email = id.email;
-  username = id.username;
-  telegram_id = id.telegramID;
-  password=id.password;
-  con = await PromiseConnection();
 
 
-    var sql = "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email +  "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
+  first_name = await id.firstname;
+  last_name = await  id.lastname;
+  email = await id.email;
+  username = await id.username;
+  telegram_id = await id.telegramID;
+  password= await id.password;
+
+
+
+    var sql =  await "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email +  "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
     const result =await con.query(sql);
       console.log("1 record updated");
