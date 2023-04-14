@@ -1,6 +1,6 @@
 CREATE TABLE `user` (
   `user_id` int NOT NULL AUTO_INCREMENT,
-  `telegram_id` int NOT NULL,
+  `telegram_id` bigint NOT NULL,
   `first_name` varchar(45) NOT NULL,
   `last_name` varchar(45) DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,

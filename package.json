@@ -1,7 +1,7 @@
 {
-  "name": "mediastack",
+  "name": "accounts",
   "version": "1.0.0",
-  "description": "mediaStack docker",
+  "description": "account microservice",
   "main": "index.js",
   "scripts": {
     "test": "npx nodemon src/app.js",
