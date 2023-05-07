@@ -3,10 +3,10 @@ const endpoints = express()
 
 const axios = require('axios')
 //database    
-var mysqlpro = require('mysql2/promise');
+let mysqlpro = require('mysql2/promise');
 const dotenv = require('dotenv')
 dotenv.config({path: '.env'})
-var con
+let con
 async function PromiseConnection() {
   con = await mysqlpro.createConnection({
     host: process.env.DB_HOST,
@@ -16,16 +16,11 @@ async function PromiseConnection() {
   });
 
 }
-
+PromiseConnection()
 
 //account variables
-var first_name="";
-var last_name="";
-var email="";
-var username="";
-var telegram_id="";
-var password="";
-var rol="";
+let first_name ,last_name, email, username, telegram_id, password,rol="";
+
 
 endpoints.post('/accounts/create', async (req, res) => {
   console.log(req.body, "este es el body")
@@ -49,7 +44,7 @@ endpoints.post('/accounts/create', async (req, res) => {
         //if(err)catchDuplicateFunction(res, err)
         console.log("Connected!");
 
-        var sql =  "INSERT INTO user (telegram_id,first_name, last_name,  username,  rol) VALUES ('" + telegram_id + "','" + first_name + "','" + last_name + "','" + username + "','" + rol + "');";
+        let sql =  "INSERT INTO user (telegram_id,first_name, last_name,  username,  rol) VALUES ('" + telegram_id + "','" + first_name + "','" + last_name + "','" + username + "','" + rol + "');";
         console.log(sql);
         await con.query(sql);
         console.log(sql);
@@ -64,7 +59,7 @@ endpoints.post('/accounts/create', async (req, res) => {
                     
        await  publishMessage(JSON.stringify(pubSubMessage))
           res.json({ "message": "1 record inserted" });
-          res.end
+          res.end();
         
      // });
 
@@ -78,7 +73,7 @@ endpoints.post('/accounts/create', async (req, res) => {
     status: 208
   })
 
-  res.end;
+  res.end();
   }
 
 })
@@ -93,20 +88,14 @@ try{
   const buff = req.body;
   //const id=buff.toString('utf-8')
   const id = buff;
-  //console.log(JSON.parse(id));
-  //  first_name=JSON.parse(id).first_name;
-  //  last_name=JSON.parse(id).last_name;
-  //  email=JSON.parse(id).email;
-  //  username=JSON.parse(id).username;
-  //  telegram_id=JSON.parse(id).chat_id;
-  //  password=JSON.parse(id).password;
-  //  rol=JSON.parse(id).rol;
-  var username = id.username;
- var  password = id.password;
+
+
+  let username = id.username;
+  let  password = id.password;
    await PromiseConnection();
     console.log("Connected!");
 
-    var sql = "SELECT password FROM  user WHERE(username='"+username+"')";
+    let sql = "SELECT password FROM  user WHERE(username='"+username+"')";
     console.log(sql);
     const result =await con.query(sql);
     const rtaPassword=result[0][0].password
@@ -117,27 +106,27 @@ if(rtaPassword){
         res.json({
           "message": "log-in"
         })
-        res.end;
+        res.end();
       }
       else {
         res.json({
           "message": "invalid password"
         })
-        res.end;
+        res.end();
       }
 }
 else{
   res.json({
     "message": "account doesnt exist"
   })
-  res.end;
+  res.end();
 }
 
     }
     catch(err){
 console.log(err)
 res.json("invalid account");
-res.end;
+res.end();
     }
 })
 
@@ -162,9 +151,9 @@ try{
 
 
 
-    var sql =  await "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email +  "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
+    let sql =   "UPDATE user SET first_name='" + first_name + "', last_name='" + last_name + "', email='" + email +  "', password='" + password + "' WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
-    const result =await con.query(sql);
+      await con.query(sql);
       console.log("1 record updated");
       const pubSubMessage={
         "telegram_user_id":telegram_id,
@@ -178,11 +167,11 @@ try{
      await  publishMessage(JSON.stringify(pubSubMessage))
       res.json({ "message": "1 record edited" });
 
-  res.end;
+  res.end();
 }
 catch(err){
 console.log(err)
-res.end
+res.end()
 }
 })
 endpoints.get('/accounts/consult/:telegramID', async (req, res) => {
@@ -196,13 +185,13 @@ try{
   await PromiseConnection();
 
 
-    var sql = "SELECT telegram_id, first_name,last_name, email, username, password FROM user   WHERE(telegram_id='" + telegram_id + "');";
+    let sql = "SELECT telegram_id, first_name,last_name, email, username, password FROM user   WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
-    var result =await con.query(sql);
+    let result =await con.query(sql);
     result=result[0][0]
       console.log("record sended");
 
-     const Message= await
+     const Message= 
      {
       "telegramID":result.telegram_id,
       "firstname":result.first_name,
@@ -214,12 +203,12 @@ try{
       console.log(Message);
       res.json(Message);
 
-  res.end;
+  res.end();
 }
 catch(err){
 console.log(err)
 res.json("error on data");
-res.end
+res.end()
 }
 })
 
@@ -228,18 +217,11 @@ endpoints.delete('/accounts/delete/:telegramID', async (req, res) => {
 try{
   let telegram_id = req.params.telegramID
 
-  //const buff = Buffer.from(req.body.message.data, 'base64');
-  //const buff = Buffer.from(req.body.message.data, 'base64');
-
-  //const id=buff.toString('utf-8')
-
-
    await PromiseConnection();
 
-
-    var sql = "DELETE from user  WHERE(telegram_id='" + telegram_id + "');";
+  let sql = "DELETE from user  WHERE(telegram_id='" + telegram_id + "');";
     console.log(sql);
-    const result =await con.query(sql);
+
       console.log("1 record inserted");
       const pubSubMessage={
         "telegram_user_id":telegram_id,
@@ -248,12 +230,12 @@ try{
                   
      await  publishMessage(JSON.stringify(pubSubMessage))
       res.json({ "message": "1 record deleted" });
-  res.end;
+      res.end();
 }
 catch(err){
   console.log(err)
   res.json({ "message": "wrong direction" });
-  res.end
+  res.end()
 }
 
 })
@@ -261,15 +243,13 @@ catch(err){
 /**
  * TODO(developer): Uncomment these variables before running the sample.
  */
-// const topicNameOrId = 'YOUR_TOPIC_NAME_OR_ID';
-// const data = JSON.stringify({foo: 'bar'});
 
 // Imports the Google Cloud client library
 const {PubSub} = require('@google-cloud/pubsub');
 
 // Creates a client; cache this for further use
 const pubSubClient = new PubSub();
-GOOGLE_APPLICATION_CREDENTIALS = '.\cryptobot-345516'
+let GOOGLE_APPLICATION_CREDENTIALS = '.\cryptobot-345516'
 async function publishMessage(messaging) {
   // Publishes the message as a string, e.g. "Hello, world!" or JSON.stringify(someObject)
   const dataBuffer = Buffer.from(messaging);
