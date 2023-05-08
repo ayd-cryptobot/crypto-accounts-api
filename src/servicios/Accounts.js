@@ -220,9 +220,9 @@ try{
    await PromiseConnection();
 
   let sql = "DELETE from user  WHERE(telegram_id='" + telegram_id + "');";
+  await con.query(sql);
     console.log(sql);
 
-      console.log("1 record inserted");
       const pubSubMessage={
         "telegram_user_id":telegram_id,
         "operation_type":"delete"
@@ -249,7 +249,7 @@ const {PubSub} = require('@google-cloud/pubsub');
 
 // Creates a client; cache this for further use
 const pubSubClient = new PubSub();
-let GOOGLE_APPLICATION_CREDENTIALS = '.\cryptobot-345516'
+let GOOGLE_APPLICATION_CREDENTIALS = '.cryptobot-345516'
 async function publishMessage(messaging) {
   // Publishes the message as a string, e.g. "Hello, world!" or JSON.stringify(someObject)
   const dataBuffer = Buffer.from(messaging);
